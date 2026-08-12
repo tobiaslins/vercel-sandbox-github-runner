@@ -136,22 +136,3 @@ export async function provisionRunner(payload: WorkflowJobPayload): Promise<void
     throw error;
   }
 }
-
-export async function cleanupRunner(payload: WorkflowJobPayload): Promise<void> {
-  const name = sandboxName(payload.workflow_job.id);
-
-  try {
-    const sandbox = await Sandbox.get({ name, resume: false });
-    await sandbox.delete();
-    console.info("Deleted GitHub runner sandbox", {
-      jobId: payload.workflow_job.id,
-      sandboxName: name,
-    });
-  } catch (error) {
-    console.info("Runner sandbox was already absent", {
-      jobId: payload.workflow_job.id,
-      sandboxName: name,
-      error: error instanceof Error ? error.message : String(error),
-    });
-  }
-}

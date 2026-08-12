@@ -12,7 +12,8 @@ GitHub App -> workflow_job webhook -> Vercel Function -> Vercel Sandbox
 There is no queue or database. GitHub webhook deliveries are acknowledged
 immediately and provisioning continues with Next.js `after()`. A deterministic
 sandbox name and a filesystem lock make duplicate queued deliveries harmless.
-Each sandbox also has a hard timeout as fallback cleanup.
+Each sandbox remains available after its job completes and stops only when its
+hard timeout expires (45 minutes by default).
 
 ## GitHub App
 
@@ -45,7 +46,8 @@ Vercel supplies Sandbox authentication automatically through project OIDC.
 
 Open Actions in GitHub and manually run `Sandbox runner smoke test`. The job
 queues with the `vercel-sandbox` label, the webhook creates a named sandbox,
-and the JIT runner accepts one job. The completed webhook deletes the sandbox.
+and the JIT runner accepts one job. The completed sandbox remains available for
+inspection until its configured timeout expires.
 
 ## Intentional limitations
 

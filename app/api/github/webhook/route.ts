@@ -1,7 +1,7 @@
 import { after } from "next/server";
 
 import { requiredEnv } from "@/lib/env";
-import { cleanupRunner, provisionRunner } from "@/lib/runner";
+import { provisionRunner } from "@/lib/runner";
 import {
   type WorkflowJobPayload,
   verifyWebhookSignature,
@@ -40,10 +40,6 @@ export async function POST(request: Request): Promise<Response> {
           error: error instanceof Error ? error.message : String(error),
         });
       });
-    });
-  } else if (payload.action === "completed") {
-    after(async () => {
-      await cleanupRunner(payload);
     });
   }
 

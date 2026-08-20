@@ -6,6 +6,7 @@
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
+    "snapshot:create": "node scripts/create-runner-snapshot.mjs",
     "typecheck": "tsc --noEmit"
   },
   "dependencies": {

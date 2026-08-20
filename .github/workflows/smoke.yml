@@ -5,9 +5,22 @@ on:
 
 jobs:
   smoke:
-    runs-on: [self-hosted, vercel-sandbox, Linux, X64]
+    runs-on: vercel-sandbox
     timeout-minutes: 15
+    services:
+      redis:
+        image: redis:7-alpine
+        ports:
+          - 6379:6379
+        options: >-
+          --health-cmd "redis-cli ping"
+          --health-interval 5s
+          --health-timeout 3s
+          --health-retries 10
     steps:
       - uses: actions/checkout@v4
       - run: uname -a
       - run: node --version
+      - run: docker version
+      - run: docker run --rm alpine:3.22 echo "Docker works"
+      - run: node -e "const net=require('node:net'); const socket=net.connect(6379, '127.0.0.1', () => socket.end()); socket.on('error', error => { throw error })"

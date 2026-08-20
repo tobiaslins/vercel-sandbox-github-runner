@@ -7,16 +7,17 @@ export default function Home() {
         for matching GitHub Actions jobs.
       </p>
       <p>
-        Configure one organization-owned GitHub App webhook as{" "}
-        <code>{"<this deployment>/api/github/webhook"}</code>, then install the
-        App on every repository that should use the runner.
+        Attach a Vercel Connect GitHub connector to this project and forward its
+        <code> workflow_job </code> trigger to{" "}
+        <code>/api/github/webhook</code>.
       </p>
       <pre>
         <code>{"runs-on: vercel-sandbox"}</code>
       </pre>
       <p>
-        Each webhook is handled directly by this customer-owned deployment. No
-        shared control plane or queue receives workflow data.
+        Connect verifies GitHub and forwards the event here with Vercel OIDC.
+        This customer-owned deployment starts the Sandbox directly; there is no
+        queue or shared runner control plane.
       </p>
     </main>
   );

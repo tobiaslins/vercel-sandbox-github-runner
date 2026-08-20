@@ -133,10 +133,6 @@ async function removeRunnerByName(
 }
 
 export async function provisionRunner(payload: WorkflowJobPayload): Promise<void> {
-  if (!payload.installation) {
-    throw new Error("workflow_job webhook did not include an installation id");
-  }
-
   const job = payload.workflow_job;
   const owner = payload.repository.owner.login;
   const repo = payload.repository.name;
@@ -170,7 +166,7 @@ export async function provisionRunner(payload: WorkflowJobPayload): Promise<void
     return;
   }
 
-  const github = await githubRequest(payload.installation.id);
+  const github = await githubRequest();
 
   try {
     await installDocker(sandbox);
@@ -235,7 +231,7 @@ export async function provisionRunner(payload: WorkflowJobPayload): Promise<void
     });
 
     console.info("Started GitHub runner", {
-      installationId: payload.installation.id,
+      githubInstallationId: payload.installation?.id,
       repository: `${owner}/${repo}`,
       jobId: job.id,
       runnerName: name,

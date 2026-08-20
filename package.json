@@ -10,8 +10,8 @@
     "typecheck": "tsc --noEmit"
   },
   "dependencies": {
-    "@octokit/auth-app": "8.3.0",
     "@octokit/request": "10.0.13",
+    "@vercel/connect": "0.8.0",
     "@vercel/sandbox": "3.0.0",
     "next": "16.3.0",
     "react": "19.2.0",

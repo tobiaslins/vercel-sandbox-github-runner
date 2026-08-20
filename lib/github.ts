@@ -1,16 +1,15 @@
-import { createAppAuth } from "@octokit/auth-app";
 import { request } from "@octokit/request";
+import { getToken } from "@vercel/connect";
 
-import { requiredEnv } from "@/lib/env";
+const DEFAULT_CONNECTOR = "github/vercel-sandbox-github-runner";
 
-export async function githubRequest(installationId: number) {
-  const auth = createAppAuth({
-    appId: requiredEnv("GITHUB_APP_ID"),
-    privateKey: requiredEnv("GITHUB_APP_PRIVATE_KEY").replaceAll("\\n", "\n"),
-    installationId,
-  });
-
-  const { token } = await auth({ type: "installation" });
+export async function githubRequest() {
+  const token = await getToken(
+    process.env.GITHUB_CONNECTOR ?? DEFAULT_CONNECTOR,
+    {
+      subject: { type: "app" },
+    },
+  );
 
   return request.defaults({
     headers: {

@@ -1,32 +1,33 @@
 import { after } from "next/server";
 
-import { requiredEnv } from "@/lib/env";
 import { provisionRunner } from "@/lib/runner";
-import {
-  type WorkflowJobPayload,
-  verifyWebhookSignature,
-} from "@/lib/webhook";
+import { isWorkflowJobPayload, verifyWebhook } from "@/lib/webhook";
 
 export const runtime = "nodejs";
 export const maxDuration = 300;
 
 export async function POST(request: Request): Promise<Response> {
   const body = await request.text();
-  const valid = verifyWebhookSignature(
-    body,
-    request.headers.get("x-hub-signature-256"),
-    requiredEnv("GITHUB_WEBHOOK_SECRET"),
-  );
+  const valid = await verifyWebhook(request, body);
 
   if (!valid) {
-    return Response.json({ error: "Invalid signature" }, { status: 401 });
+    return Response.json({ error: "Invalid Vercel OIDC token" }, { status: 401 });
   }
 
-  if (request.headers.get("x-github-event") !== "workflow_job") {
+  const event = request.headers.get("x-github-event");
+  if (event && event !== "workflow_job") {
     return Response.json({ ignored: true });
   }
 
-  const payload = JSON.parse(body) as WorkflowJobPayload;
+  let payload: unknown;
+  try {
+    payload = JSON.parse(body);
+  } catch {
+    return Response.json({ error: "Invalid JSON" }, { status: 400 });
+  }
+  if (!isWorkflowJobPayload(payload)) {
+    return Response.json({ error: "Invalid workflow_job payload" }, { status: 400 });
+  }
   const runnerLabel = process.env.GITHUB_RUNNER_LABEL ?? "vercel-sandbox";
   if (!payload.workflow_job.labels.includes(runnerLabel)) {
     return Response.json({ ignored: true });

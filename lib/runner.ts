@@ -23,6 +23,19 @@ const RUNNER_DIRECTORY = "/vercel/sandbox/actions-runner";
 const BOOTSTRAP_LOCK = "/tmp/github-runner-bootstrap.lock";
 const DOCKER_HOST = "unix:///var/run/docker.sock";
 
+function isExecutableNotFound(error: unknown): boolean {
+  if (!error || typeof error !== "object") return false;
+
+  const json = (error as {
+    json?: { code?: unknown; error?: { code?: unknown } };
+  }).json;
+
+  return (
+    json?.code === "executable_not_found" ||
+    json?.error?.code === "executable_not_found"
+  );
+}
+
 function sandboxName(jobId: number): string {
   return `github-job-${jobId}`;
 }
@@ -38,8 +51,12 @@ async function runOrThrow(
 }
 
 async function installDocker(sandbox: Sandbox): Promise<void> {
-  const installed = await sandbox.runCommand("docker", ["--version"]);
-  if (installed.exitCode === 0) return;
+  try {
+    const installed = await sandbox.runCommand("docker", ["--version"]);
+    if (installed.exitCode === 0) return;
+  } catch (error) {
+    if (!isExecutableNotFound(error)) throw error;
+  }
 
   await runOrThrow(sandbox, {
     cmd: "bash",
@@ -239,7 +256,6 @@ export async function provisionRunner(payload: WorkflowJobPayload): Promise<void
     });
   } catch (error) {
     await removeRunnerByName(github, owner, repo, name).catch(() => undefined);
-    await sandbox.delete().catch(() => undefined);
     throw error;
   }
 }

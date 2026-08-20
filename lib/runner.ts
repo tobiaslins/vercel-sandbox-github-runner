@@ -154,7 +154,7 @@ export async function provisionRunner(payload: WorkflowJobPayload): Promise<void
   const owner = payload.repository.owner.login;
   const repo = payload.repository.name;
   const name = sandboxName(job.id);
-  const runnerLabel = process.env.GITHUB_RUNNER_LABEL ?? "vercel-sandbox";
+  const runnerLabels = [...new Set(job.labels)].join(",");
   const timeoutMinutes = positiveIntegerEnv("SANDBOX_TIMEOUT_MINUTES", 45);
   const vcpus = positiveIntegerEnv("SANDBOX_VCPUS", 2);
   const snapshotId = process.env.SANDBOX_SNAPSHOT_ID;
@@ -229,7 +229,7 @@ export async function provisionRunner(payload: WorkflowJobPayload): Promise<void
         "--name",
         name,
         "--labels",
-        runnerLabel,
+        runnerLabels,
         "--work",
         "_work",
       ],

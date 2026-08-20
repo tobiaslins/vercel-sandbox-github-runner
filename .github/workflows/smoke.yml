@@ -5,7 +5,7 @@ on:
 
 jobs:
   smoke:
-    runs-on: vercel-sandbox
+    runs-on: vercel-sandbox-${{ github.run_id }}-${{ github.run_attempt }}
     timeout-minutes: 15
     services:
       redis:

@@ -60,7 +60,10 @@ export async function POST(request: Request): Promise<Response> {
     return Response.json({ error: "Invalid workflow_job payload" }, { status: 400 });
   }
   const runnerLabel = process.env.GITHUB_RUNNER_LABEL ?? "vercel-sandbox";
-  if (!payload.workflow_job.labels.includes(runnerLabel)) {
+  const matchesRunner = payload.workflow_job.labels.some(
+    (label) => label === runnerLabel || label.startsWith(`${runnerLabel}-`),
+  );
+  if (!matchesRunner) {
     return Response.json({ ignored: true });
   }
 

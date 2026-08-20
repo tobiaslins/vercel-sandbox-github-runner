@@ -45,18 +45,19 @@ select it before continuing.
 
 ### 3. Use the runner
 
-Set `runs-on: vercel-sandbox` in any selected repository:
+Use a run-scoped label in any selected repository:
 
 ```yaml
 jobs:
   test:
-    runs-on: vercel-sandbox
+    runs-on: vercel-sandbox-${{ github.run_id }}-${{ github.run_attempt }}
     steps:
       - uses: actions/checkout@v4
       - run: pnpm test
 ```
 
 That is it. The next queued job with this label starts its own Vercel Sandbox.
+The run ID and attempt keep a new Sandbox from consuming an older queued job.
 
 ## Manual setup
 
@@ -102,7 +103,7 @@ All variables are optional when the connector uses the default name:
 | Variable | Default | Purpose |
 | --- | --- | --- |
 | `GITHUB_CONNECTOR` | `github/vercel-sandbox-github-runner` | Vercel Connect connector UID |
-| `GITHUB_RUNNER_LABEL` | `vercel-sandbox` | Required workflow runner label |
+| `GITHUB_RUNNER_LABEL` | `vercel-sandbox` | Required workflow runner label prefix |
 | `SANDBOX_SNAPSHOT_ID` | empty | Prebuilt runner filesystem snapshot |
 | `SANDBOX_TIMEOUT_MINUTES` | `45` | Sandbox hard timeout |
 | `SANDBOX_VCPUS` | `2` | Sandbox virtual CPU count |

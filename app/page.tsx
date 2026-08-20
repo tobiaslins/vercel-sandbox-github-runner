@@ -12,7 +12,9 @@ export default function Home() {
         <code>/api/github/webhook</code>.
       </p>
       <pre>
-        <code>{"runs-on: vercel-sandbox"}</code>
+        <code>
+          {"runs-on: vercel-sandbox-${{ github.run_id }}-${{ github.run_attempt }}"}
+        </code>
       </pre>
       <p>
         Connect verifies GitHub and forwards the event here with Vercel OIDC.

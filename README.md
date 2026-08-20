@@ -3,7 +3,7 @@
 Run GitHub Actions jobs on short-lived, customer-owned Vercel Sandboxes. One
 Vercel project can serve every selected repository in a GitHub organization.
 
-[![Deploy with Vercel](https://vercel.com/button)](https://vercel.com/new/clone?repository-url=https%3A%2F%2Fgithub.com%2Ftobiaslins%2Fvercel-sandbox-github-runner&project-name=vercel-sandbox-github-runner&repository-name=vercel-sandbox-github-runner&connect=%5B%7B%22type%22%3A%22github%22%2C%22env%22%3A%22GITHUB_CONNECTOR%22%2C%22triggers%22%3Atrue%2C%22events%22%3A%5B%22workflow_job%22%5D%2C%22triggerPath%22%3A%22%2Fapi%2Fgithub%2Fwebhook%22%7D%5D)
+[![Deploy with Vercel](https://vercel.com/button)](https://vercel.com/new/clone?repository-url=https%3A%2F%2Fgithub.com%2Ftobiaslins%2Fvercel-sandbox-github-runner&project-name=vercel-sandbox-github-runner&repository-name=vercel-sandbox-github-runner&connect=%5B%7B%22type%22%3A%22github%22%2C%22env%22%3A%22GITHUB_CONNECTOR%22%2C%22triggers%22%3Atrue%2C%22events%22%3A%5B%22workflow_job%22%5D%2C%22permissions%22%3A%7B%22actions%22%3A%22read%22%2C%22administration%22%3A%22write%22%7D%2C%22triggerPath%22%3A%22%2Fapi%2Fgithub%2Fwebhook%22%7D%5D)
 
 ## How it works
 
@@ -36,12 +36,13 @@ creates the Vercel project and connects it to GitHub.
 When GitHub configuration opens:
 
 - choose the GitHub organization and repositories that may use the runner;
-- grant **Actions: Read-only**;
-- grant **Administration: Read and write**;
-- confirm that the `workflow_job` event is selected.
+- review the preselected **Actions: Read-only** and **Administration: Read and
+  write** permissions;
+- approve the installation.
 
-`workflow_job` is preselected by the Deploy Button. If it is not selected,
-select it before continuing.
+The Deploy Button also preselects the `workflow_job` event. Customers approve
+the requested access once during installation; there is no later permission
+update step.
 
 ### 3. Use the runner
 

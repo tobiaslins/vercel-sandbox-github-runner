@@ -3,7 +3,7 @@
 Run GitHub Actions jobs on short-lived, customer-owned Vercel Sandboxes. One
 Vercel project can serve every selected repository in a GitHub organization.
 
-[![Deploy with Vercel](https://vercel.com/button)](https://vercel.com/new/clone?repository-url=https%3A%2F%2Fgithub.com%2Ftobiaslins%2Fvercel-sandbox-github-runner&project-name=vercel-sandbox-github-runner&repository-name=vercel-sandbox-github-runner)
+[![Deploy with Vercel](https://vercel.com/button)](https://vercel.com/new/clone?repository-url=https%3A%2F%2Fgithub.com%2Ftobiaslins%2Fvercel-sandbox-github-runner&project-name=vercel-sandbox-github-runner&repository-name=vercel-sandbox-github-runner&connect=%5B%7B%22type%22%3A%22github%22%2C%22env%22%3A%22GITHUB_CONNECTOR%22%2C%22triggers%22%3Atrue%2C%22events%22%3A%5B%22workflow_job%22%5D%2C%22triggerPath%22%3A%22%2Fapi%2Fgithub%2Fwebhook%22%7D%5D)
 
 ## Architecture
 
@@ -30,32 +30,28 @@ available for inspection until its hard timeout expires.
 
 ### 1. Deploy the project
 
-Use the Deploy Button above. The resulting Vercel project owns all Functions,
-Sandboxes, usage, and logs.
+Use the Deploy Button above. It creates or selects a managed GitHub connector,
+links it to the new project, writes its UID to `GITHUB_CONNECTOR`, enables
+trigger forwarding, preselects `workflow_job`, and registers
+`/api/github/webhook` as the production trigger destination. The resulting
+Vercel project owns all Functions, Sandboxes, usage, and logs.
 
 Make sure OIDC Federation is enabled for the project. Vercel deployments use it
 to authenticate both Vercel Connect and Sandbox without stored credentials.
 
-### 2. Create the GitHub connector
+### 2. Configure GitHub access
 
-In Vercel Connect, create a managed GitHub connector named
-`vercel-sandbox-github-runner` with webhook triggers enabled. During its GitHub
-configuration:
+During the GitHub connector configuration opened by the deploy flow:
 
 - grant repository **Actions: Read-only**;
 - grant repository **Administration: Read and write**;
-- manually add the `workflow_job` trigger event;
+- verify that `workflow_job` is the selected trigger event;
 - install it on the GitHub organization and choose all or selected repositories.
 
-Then attach the connector to the deployed project for **Production** and set its
-trigger destination to:
+If an older deploy flow does not preselect `workflow_job`, select it manually.
 
-```text
-/api/github/webhook
-```
-
-The equivalent CLI flow, run from a checkout linked to the deployed Vercel
-project, is:
+For a project created without the Deploy Button, the equivalent CLI flow from a
+checkout linked to that project is:
 
 ```bash
 vercel connect create github \
@@ -68,8 +64,9 @@ vercel connect attach github/vercel-sandbox-github-runner \
   --trigger-path /api/github/webhook
 ```
 
-The create flow opens the managed GitHub connector configuration, where
-`workflow_job`, permissions, organization, and repository access are selected.
+The create flow opens the managed GitHub connector configuration. Select
+`workflow_job`, the required permissions, organization, and repository access
+there.
 
 If the connector has a different UID, set `GITHUB_CONNECTOR` to that UID and
 redeploy. No GitHub App ID, private key, webhook secret, or Vercel Integration is
